@@ -16,7 +16,7 @@ jobs:
       steps:
         - name: Get Latest GHCR image
           run: |
-            curl -sL https://api.github.com/repos/vmware-tanzu/carvel-kapp-controller/releases/latest | jq -r '.assets[].browser_download_url'
+            curl -sL https://api.github.com/repos/vmware-tanzu/carvel-kapp-controller/releases/latest | jq -r '.assets[].browser_download_url' | wget -i -a
 
             IMAGE=$(yq eval '.spec.Release Assetstemplate.spec.containers[0].image' release.yml -N -j | jq 'select(. != null)') >> $GITHUB_ENV
         - name: Install Trivy
