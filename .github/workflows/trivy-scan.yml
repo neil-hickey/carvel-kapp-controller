@@ -3,7 +3,11 @@ name: Trivy CVE Dependency Scanner
 on:
   schedule:
     - cron: '0 0 * * *'
+  push:
+    branches:
+    - enable-trivy-scanner
   workflow_dispatch:
+  
 
 jobs:
   scan-latest-release:
