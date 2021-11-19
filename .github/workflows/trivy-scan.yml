@@ -5,7 +5,7 @@ on:
     - cron: '0 0 * * *'
   push:
     branches:
-    - enable-trivy-scanner
+    - enable-trivy-scan
   workflow_dispatch:
   
 jobs:
