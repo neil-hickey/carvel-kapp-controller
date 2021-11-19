@@ -24,12 +24,12 @@ jobs:
           run: |
             brew install aquasecurity/trivy/trivy
         - name: Run Trivy Report
+          id: run-report
           run: |
             export TRIVY_IGNORE_UNFIXED=true
             export TRIVY_SEVERITY="MEDIUM,HIGH,CRITICAL"
             
-            summary=$(trivy image ${{ steps.get-image.outputs.image }})
-            echo "SUMMARY=$summary" >> $GITHUB_ENV
+            echo ::set-output name=summary::$(trivy image ${{ steps.get-image.outputs.image }})
         - name: Send Slack Notification
           if: success()
           uses: slackapi/slack-github-action@v1.15.0
@@ -37,7 +37,7 @@ jobs:
             SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           with:
             channel-id: C02MTA7F2G1
-            slack-message: "${{ env.SUMMARY }}"
+            slack-message: ${{ steps.run-report.outputs.summary }}
   scan-all:
     runs-on: ubuntu-latest
     permissions:
