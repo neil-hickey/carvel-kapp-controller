@@ -9,35 +9,6 @@ on:
   workflow_dispatch:
   
 jobs:
-  scan-latest-release:
-      runs-on: ubuntu-latest
-      permissions:
-        security-events: write
-      steps:
-        - name: Get Latest GHCR image
-          id: get-image
-          run: |
-            curl -sL https://api.github.com/repos/vmware-tanzu/carvel-kapp-controller/releases/latest | jq -r '.assets[].browser_download_url' | wget -i -
-
-            echo ::set-output name=image::$(yq eval '.spec.template.spec.containers[0].image' release.yml -N -j | jq 'select(. != null)' -r)
-        - name: Install Trivy
-          run: |
-            brew install aquasecurity/trivy/trivy
-        - name: Run Trivy Report
-          id: run-report
-          run: |
-            export TRIVY_IGNORE_UNFIXED=true
-            export TRIVY_SEVERITY="MEDIUM,HIGH,CRITICAL"
-            
-            echo ::set-output name=summary::$(trivy image ${{ steps.get-image.outputs.image }})
-        - name: Send Slack Notification
-          if: success()
-          uses: slackapi/slack-github-action@v1.15.0
-          env:
-            SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          with:
-            channel-id: C02MTA7F2G1
-            slack-message: ${{ steps.run-report.outputs.summary }}
   scan-all:
     runs-on: ubuntu-latest
     permissions:
