@@ -17,8 +17,10 @@ jobs:
         - name: Get Latest GHCR image
           run: |
             curl -sL https://api.github.com/repos/vmware-tanzu/carvel-kapp-controller/releases/latest | jq -r '.assets[].browser_download_url' | wget -i -
-
+            tag_name=$(curl -sL https://api.github.com/repos/vmware-tanzu/carvel-kapp-controller/releases/latest | jq -r '.tag_name')
+            
             echo "IMAGE=$(yq eval '.spec.template.spec.containers[0].image' release.yml -N -j | jq 'select(. != null)' -r)" >> $GITHUB_ENV
+            echo "TAG_NAME=$tag_name" >> $GITHUB_ENV
         - name: Install Trivy
           run: |
             brew install aquasecurity/trivy/trivy
@@ -32,6 +34,10 @@ jobs:
             export TRIVY_TEMPLATE="@trivy/contrib/sarif.tpl"
 
             trivy image --format template --output trivy-results-image.sarif "${{ env.IMAGE }}"
+        - name: Check out code at tag
+          uses: actions/checkout@v1
+          with:
+            ref: ${{ env.TAG_NAME }}
         - name: Upload Trivy scan results to GitHub Security tab
           uses: github/codeql-action/upload-sarif@v1
           with:
