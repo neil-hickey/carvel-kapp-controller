@@ -6,6 +6,34 @@ on:
   workflow_dispatch:
 
 jobs:
+  scan-latest-release:
+      runs-on: ubuntu-latest
+      permissions:
+        security-events: write
+      steps:
+        - name: Get Latest GHCR image
+          run: |
+            curl -sL https://api.github.com/repos/vmware-tanzu/carvel-kapp-controller/releases/latest | jq -r '.assets[].browser_download_url'
+
+            IMAGE=$(yq eval '.spec.Release Assetstemplate.spec.containers[0].image' release.yml -N -j | jq 'select(. != null)') >> $GITHUB_ENV
+        - name: Install Trivy
+          run: |
+            brew install aquasecurity/trivy/trivy
+
+            # download the sarif format template
+            git clone --depth 1 https://github.com/aquasecurity/trivy
+        - name: Run Trivy Reports
+          run: |
+            export TRIVY_IGNORE_UNFIXED=true
+            export TRIVY_SEVERITY="MEDIUM,HIGH,CRITICAL"
+            export TRIVY_TEMPLATE="@trivy/contrib/sarif.tpl"
+
+            trivy image --format template --output trivy-results-image.sarif "${{ env.IMAGE }}"
+        - name: Upload Trivy scan results to GitHub Security tab
+          uses: github/codeql-action/upload-sarif@v1
+          with:
+            sarif_file: '.'
+            category: latest-release
   scan-all:
     runs-on: ubuntu-latest
     permissions:
@@ -68,7 +96,7 @@ jobs:
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         with:
-          channel-id: G01FTP43JMQ
+          channel-id: C02MTA7F2G1
           slack-message: "${{ env.SUMMARY }}"
       - name: Send Failure notification
         if: failure()
@@ -76,5 +104,5 @@ jobs:
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         with:
-          channel-id: G01FTP43JMQ
+          channel-id: C02MTA7F2G1
           slack-message: "Trivy scan workflow failed. Please check the latest github action run for trivy scanner."
