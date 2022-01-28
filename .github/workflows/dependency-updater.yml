@@ -3,7 +3,7 @@ name: dependency-updater
 on:
   push:
     branches:
-      - main
+      - develop
       
 jobs:
   check-for-releases:
