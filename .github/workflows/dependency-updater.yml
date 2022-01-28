@@ -1,0 +1,24 @@
+name: dependency-updater
+
+on:
+  push:
+    branches:
+      - main
+      
+jobs:
+  check-for-releases:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tool: ['ytt', 'kapp']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Get Current Release Version
+        run: |
+          cat hack/install-dep.sh
+      - name: Get Latest Release Version
+        run: |
+          curl -sL https://api.github.com/repos/vmware-tanzu/carvel-${{ matrix.tool }}/releases/latest | jq -r '.tag_name'
