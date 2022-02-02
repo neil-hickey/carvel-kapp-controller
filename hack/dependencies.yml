@@ -1,5 +1,5 @@
 ---
-ytt_version: v0.38.0
+ytt_version: v0.37.0
 ytt_checksum_darwin: 1f84e26457a5efd2470df408072bf2f182c939414e4958f82e19e122d2ee120c
 ytt_checksum_linux: 2ca800c561464e0b252e5ee5cacff6aa53831e65e2fb9a09cf388d764013c40d
 kbld_version: v0.32.0
