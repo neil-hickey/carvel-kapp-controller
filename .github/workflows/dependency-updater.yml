@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-    - dependency-updater
+    - testing-pr
       
 jobs:
   update-latest-release:
