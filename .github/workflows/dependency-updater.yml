@@ -44,6 +44,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@f22a7da129c901513876a2380e2dae9f8e145330
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: Bump ${{ matrix.tool }} to ${{ steps.latest-version.outputs.version }}
           title: Bump ${{ matrix.tool }} to ${{ steps.latest-version.outputs.version }}
           delete-branch: true
