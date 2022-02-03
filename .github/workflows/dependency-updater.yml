@@ -4,10 +4,9 @@ on:
   schedule:
     - cron: '0 12 * * *'
   workflow_dispatch:
-  on:
-    push:
-      branches:
-      - dependency-updater
+  push:
+    branches:
+    - dependency-updater
       
 jobs:
   update-latest-release:
