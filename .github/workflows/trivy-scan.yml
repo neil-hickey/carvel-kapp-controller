@@ -12,7 +12,7 @@ jobs:
       - name: Get Latest Release Docker Image Sha
         id: latest-sha
         run: |
-          set -eo pipefail
+          set -eox pipefail
           # Get the latest released docker image sha
           curl -sL https://api.github.com/repos/vmware-tanzu/carvel-kapp-controller/releases/latest | jq -r '.assets[] | select(.name | contains("release.yml")).browser_download_url' | wget -i -
 
